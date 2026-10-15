@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Living Text: Whitman's Preface</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<style>
+  :root { color-scheme: dark; box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body { margin: 0; background: #05060d; color: #e2e8f0; font-family: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
+  .display { font-family: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif; }
+  button:focus-visible, textarea:focus-visible, .hot:focus-visible { outline: 2px solid #a5f3fc; outline-offset: 3px; }
+
+  /* floating text */
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(calc(var(--amp, 0px) * -1)); } }
+  .float { animation: floaty 9s ease-in-out infinite; }
+
+  /* vocabulary hotspots */
+  @keyframes hotpulse {
+    0%,100% { text-shadow: 0 0 5px var(--c), 0 0 12px var(--c); }
+    50%     { text-shadow: 0 0 10px var(--c), 0 0 26px var(--c), 0 0 42px var(--c); }
+  }
+  .hot { color: var(--c); font-style: italic; font-weight: 500; cursor: help; padding: 0 .12em; border-radius: 6px;
+         border-bottom: 1px dashed var(--c); animation: hotpulse 3.2s ease-in-out infinite; transition: background .3s, transform .3s; }
+  .hot:hover, .hot:focus-visible { background: color-mix(in srgb, var(--c) 16%, transparent); transform: translateY(-1px); }
+  .hot.found { border-bottom-style: solid; }
+
+  /* tooltip */
+  @keyframes tipin { from { opacity: 0; } to { opacity: 1; } }
+  .tip { position: fixed; z-index: 60; pointer-events: none; padding: 14px 18px 15px; border-radius: 18px;
+         background: rgba(8,10,24,.9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+         border: 1px solid color-mix(in srgb, var(--c) 60%, transparent);
+         box-shadow: 0 0 34px color-mix(in srgb, var(--c) 32%, transparent), inset 0 0 22px color-mix(in srgb, var(--c) 10%, transparent);
+         animation: tipin .25s ease-out; }
+
+  /* screen effect on hover */
+  @keyframes ring { from { transform: translate(-50%,-50%) scale(0); opacity: .75; } to { transform: translate(-50%,-50%) scale(1); opacity: 0; } }
+  @keyframes flash { 0% { opacity: 0; } 18% { opacity: 1; } 100% { opacity: 0; } }
+  .burst-ring { position: fixed; width: 1100px; height: 1100px; border-radius: 9999px; border: 1.5px solid; pointer-events: none; z-index: 5; animation: ring 1.7s cubic-bezier(.2,.7,.2,1) forwards; }
+  .burst-flash { position: fixed; inset: 0; pointer-events: none; z-index: 4; animation: flash 1.4s ease-out forwards; }
+
+  /* aurora */
+  .aur { position: absolute; border-radius: 50%; filter: blur(95px); transition: opacity 1.8s ease; }
+  @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(8vw,6vh) scale(1.15); } }
+  @keyframes drift2 { from { transform: translate(0,0) scale(1.1); } to { transform: translate(-9vw,-4vh) scale(.9); } }
+  @keyframes drift3 { from { transform: translate(0,0) scale(.9); } to { transform: translate(6vw,-8vh) scale(1.2); } }
+  .a1 { width: 55vmax; height: 55vmax; left: -14vmax; top: -12vmax; background: #0ea5e9; animation: drift1 24s ease-in-out infinite alternate; }
+  .a2 { width: 48vmax; height: 48vmax; right: -16vmax; top: 18vh; background: #a855f7; animation: drift2 28s ease-in-out infinite alternate; }
+  .a3 { width: 44vmax; height: 44vmax; left: 18vw; bottom: -26vmax; background: #f59e0b; animation: drift3 31s ease-in-out infinite alternate; }
+
+  /* meter */
+  @keyframes shimmer { from { background-position: 0 0; } to { background-position: 200% 0; } }
+  .meter-fill { background-image: linear-gradient(90deg, #5eead4, #c084fc, #fbbf24, #f9a8d4, #5eead4); background-size: 200% 100%; animation: shimmer 6s linear infinite; }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .rise { animation: rise .7s ease-out both; }
+
+  textarea::placeholder { color: #64748b; font-style: italic; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .float, .hot, .meter-fill, .a1, .a2, .a3, .rise { animation: none !important; }
+    .burst-ring, .burst-flash { display: none; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+const { useState, useEffect, useRef, useCallback } = React;
+const html = htm.bind(React.createElement);
+
+/* ---------- content ---------- */
+const PARAS = [
+  "America does not repel the past or what it has produced under its forms or amid other politics or the idea of castes or the old religions... accepts the lesson with calmness... is not so impatient as has been supposed that the slough still sticks to opinions and manners and literature while the life which served its requirements has passed into the new life of the new forms... perceives that the corpse is slowly borne from the eating and sleeping rooms of the house...",
+  "The Americans of all nations at any time upon the earth have probably the fullest poetical nature. The United States themselves are essentially the greatest poem... In the history of the earth hitherto the largest and most stirring appear tame and orderly to their ampler largeness and stir. Here is not merely a nation but a teeming nation of nations. Here is action untied from strings necessarily blind to particulars and details magnificently moving in vast masses... Here the performance disdaining the trivial unapproached in the tremendous audacity of its crowds and groupings and the push of its perspective spreads with crampless and flowing breadth and showers its prolific and splendid extravagance."
+];
+
+const VOCAB = {
+  ampler:   { pos: 'adjective', def: 'more abundant', ctx: 'their ampler largeness and stir', color: '#67e8f9' },
+  teeming:  { pos: 'adjective', def: 'full',           ctx: 'a teeming nation of nations',    color: '#86efac' },
+  vast:     { pos: 'adjective', def: 'huge',           ctx: 'moving in vast masses',          color: '#a5b4fc' },
+  breadth:  { pos: 'noun',      def: 'wide range; expansive extent', ctx: 'crampless and flowing breadth', color: '#f9a8d4' },
+  prolific: { pos: 'adjective', def: 'fruitful; abundant', ctx: 'its prolific and splendid extravagance', color: '#fcd34d' }
+};
+const WORDS = Object.keys(VOCAB);
+
+const QS = [
+  { key: 'factual', title: 'Factual Question', color: '#5eead4',
+    hint: 'Something the passage states outright. Someone could point to the line that answers it.',
+    stems: ['According to Whitman, what ', 'Where in the passage does '],
+    placeholder: 'Ask what the text plainly says...' },
+  { key: 'interpretive', title: 'Interpretive Question', color: '#c084fc',
+    hint: 'Something the passage only suggests. Readers could defend different answers.',
+    stems: ['Why might Whitman call the United States ', 'What does Whitman mean by '],
+    placeholder: 'Ask what the text implies...' },
+  { key: 'universal', title: 'Universal Question', color: '#fbbf24',
+    hint: 'A question the passage raises that reaches past America, and past Whitman.',
+    stems: ['Should a people ', 'What do we owe the past when '],
+    placeholder: 'Ask what matters beyond the page...' }
+];
+
+const STAGES = [
+  { min: 0,    name: 'The slough',  line: 'The corpse is still in the house.' },
+  { min: 0.12, name: 'Stirring',    line: 'Something is moving under the old forms.' },
+  { min: 0.4,  name: 'Breathing',   line: 'The slough is loosening.' },
+  { min: 0.85, name: 'New life',    line: 'The corpse is carried out. The house stands open.' }
+];
+const stageFor = v => STAGES.slice().reverse().find(s => v >= s.min);
+
+const hexA = (hex, a) => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+};
+
+/* ---------- icons (lucide paths, inlined so the page has no build step) ---------- */
+const Icon = ({ d, size = 16, className = '' }) => html`
+  <svg width=${size} height=${size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+       strokeLinecap="round" strokeLinejoin="round" className=${className} aria-hidden="true">
+    ${d.map((p, i) => html`<path key=${i} d=${p} />`)}
+  </svg>`;
+const ICONS = {
+  feather: ['M12.67 19a2 2 0 0 0 1.416-.588l6.154-6.172a6 6 0 0 0-8.49-8.49L5.586 9.914A2 2 0 0 0 5 11.328V18a1 1 0 0 0 1 1z', 'M16 8 2 22', 'M17.5 15H9'],
+  check: ['M20 6 9 17l-5-5'],
+  pencil: ['M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z', 'm15 5 4 4'],
+  reset: ['M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8', 'M3 3v5h5'],
+  sparkles: ['M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z'],
+  copy: ['M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z', 'M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2']
+};
+
+/* ---------- drifting motes: colorless and slow in the slough, bright and quick in new life ---------- */
+function Motes({ vRef }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const cv = ref.current, ctx = cv.getContext('2d');
+    const hues = [175, 275, 45, 330, 205];
+    const motes = Array.from({ length: 72 }, (_, i) => ({
+      x: Math.random(), y: Math.random(), r: 0.6 + Math.random() * 2.2,
+      sp: 0.3 + Math.random() * 0.7, ph: Math.random() * 6.28, hue: hues[i % 5]
+    }));
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let w = 0, h = 0, last = performance.now(), raf;
+    const size = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth; h = window.innerHeight;
+      cv.width = w * dpr; cv.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    size(); window.addEventListener('resize', size);
+    const draw = (t) => {
+      const dt = Math.min(t - last, 50); last = t;
+      const v = vRef.current;
+      ctx.clearRect(0, 0, w, h);
+      for (const m of motes) {
+        if (!reduce) {
+          m.y -= m.sp * (0.00004 + v * 0.00035) * dt;
+          m.x += Math.sin(t * 0.0004 + m.ph) * 0.00006 * (0.3 + v) * dt;
+          if (m.y < -0.02) { m.y = 1.02; m.x = Math.random(); }
+        }
+        const tw = 0.5 + 0.5 * Math.sin(t * 0.002 + m.ph);
+        const alpha = 0.1 + v * 0.5 * (0.4 + 0.6 * tw);
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(${m.hue}, ${6 + v * 90}%, ${58 + v * 14}%, ${alpha})`;
+        ctx.shadowBlur = v > 0.2 ? 6 + v * 14 : 0;
+        ctx.shadowColor = `hsla(${m.hue}, 95%, 65%, ${v * 0.8})`;
+        ctx.arc(m.x * w, m.y * h, m.r * (0.8 + v * 0.7), 0, 6.283);
+        ctx.fill();
+      }
+      raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', size); };
+  }, []);
+  return html`<canvas ref=${ref} className="fixed inset-0 pointer-events-none z-[1]" aria-hidden="true" />`;
+}
+
+function Aurora({ v }) {
+  const o = 0.035 + v * 0.42;
+  return html`
+    <div className="fixed inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div className="aur a1" style=${{ opacity: o }}></div>
+      <div className="aur a2" style=${{ opacity: o * 0.85 }}></div>
+      <div className="aur a3" style=${{ opacity: o * 0.6 }}></div>
+    </div>`;
+}
+
+function Burst({ b }) {
+  if (!b) return null;
+  return html`
+    <div aria-hidden="true">
+      <div key=${'f' + b.id} className="burst-flash"
+           style=${{ background: `radial-gradient(circle at ${b.x}px ${b.y}px, ${hexA(b.color, 0.2)}, transparent 55%)` }}></div>
+      <div key=${'r' + b.id} className="burst-ring"
+           style=${{ left: b.x, top: b.y, borderColor: hexA(b.color, 0.8), boxShadow: `0 0 50px ${hexA(b.color, 0.45)}, inset 0 0 50px ${hexA(b.color, 0.2)}` }}></div>
+    </div>`;
+}
+
+function Tip({ hot, found }) {
+  if (!hot) return null;
+  const d = VOCAB[hot.w];
+  const vw = window.innerWidth;
+  const W = Math.min(300, vw - 24);
+  const left = Math.max(12, Math.min(hot.r.left + hot.r.width / 2 - W / 2, vw - W - 12));
+  const above = hot.r.top > 190;
+  const style = {
+    left, width: W, '--c': d.color,
+    top: above ? hot.r.top - 12 : hot.r.top + hot.r.height + 12,
+    transform: above ? 'translateY(-100%)' : 'none'
+  };
+  return html`
+    <div className="tip" role="tooltip" style=${style}>
+      <div className="flex items-baseline gap-2">
+        <span className="display text-[1.7rem] italic leading-none" style=${{ color: d.color, textShadow: `0 0 16px ${hexA(d.color, 0.7)}` }}>${hot.w}</span>
+        <span className="text-xs text-slate-400">${d.pos}</span>
+      </div>
+      <p className="mt-2 text-[0.95rem] leading-snug text-slate-100">${d.def}</p>
+      <p className="display mt-2 text-[1.05rem] italic leading-snug text-slate-400">in the text: ${d.ctx}</p>
+      <p className="mt-2 text-xs text-slate-500">${found} of 5 words found</p>
+    </div>`;
+}
+
+function Hot({ w, isFound, onShow, onHide }) {
+  const d = VOCAB[w];
+  return html`
+    <span className=${'hot' + (isFound ? ' found' : '')} tabIndex="0" role="button"
+          aria-label=${w + ': ' + d.def} style=${{ '--c': d.color }}
+          onMouseEnter=${e => onShow(w, e.currentTarget)} onMouseLeave=${onHide}
+          onFocus=${e => onShow(w, e.currentTarget)} onBlur=${onHide}
+          onClick=${e => onShow(w, e.currentTarget)}>${w}</span>`;
+}
+
+/* ---------- the three voids ---------- */
+function Void({ q, value, done, onChange, onSubmit, onRevise }) {
+  const len = value.trim().length;
+  const ready = len >= 12;
+  const act = done ? 1 : Math.min(len / 40, 1) * 0.5;
+  const status = done ? 'Released' : len > 0 ? 'Forming' : 'Waiting';
+  const taRef = useRef(null);
+  const style = {
+    border: `1px solid ${hexA(q.color, 0.12 + act * 0.7)}`,
+    borderRadius: `${6 + act * 24}px`,
+    background: `radial-gradient(120% 100% at 50% 0%, ${hexA(q.color, act * 0.14)}, rgba(6,8,20,0.72))`,
+    boxShadow: `0 0 ${act * 36}px ${hexA(q.color, act * 0.32)}, inset 0 0 ${18 + act * 36}px ${hexA(q.color, act * 0.1)}`,
+    transition: 'all 1.1s cubic-bezier(.2,.7,.2,1)'
+  };
+  const addStem = (s) => {
+    onChange(value ? value : s);
+    setTimeout(() => { const el = taRef.current; if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); } }, 0);
+  };
+  return html`
+    <section className="relative p-5 sm:p-6" style=${style} aria-label=${q.title}>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h3 className="display text-[1.55rem] font-medium leading-tight" style=${{ color: q.color, textShadow: `0 0 ${6 + act * 16}px ${hexA(q.color, 0.2 + act * 0.5)}` }}>${q.title}</h3>
+          <p className="mt-1 text-[0.82rem] leading-relaxed text-slate-400 max-w-[34ch]">${q.hint}</p>
+        </div>
+        <span className="shrink-0 rounded-full px-2.5 py-1 text-xs"
+              style=${{ color: act > 0 ? q.color : '#64748b', border: `1px solid ${hexA(q.color, 0.15 + act * 0.5)}` }}>${status}</span>
+      </div>
+
+      ${done ? html`
+        <div className="mt-4">
+          <p className="display text-[1.4rem] italic leading-snug text-slate-50" style=${{ textShadow: `0 0 18px ${hexA(q.color, 0.45)}` }}>${value}</p>
+          <button onClick=${onRevise} className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-xs text-slate-300 transition hover:border-white/40 hover:text-white">
+            <${Icon} d=${ICONS.pencil} size=${13} /> Revise
+          </button>
+        </div>` : html`
+        <div className="mt-3">
+          <textarea ref=${taRef} rows="3" value=${value} aria-label=${q.title} placeholder=${q.placeholder}
+            onChange=${e => onChange(e.target.value)}
+            className="display w-full resize-none rounded-lg bg-transparent px-1 py-1 text-[1.3rem] leading-snug text-slate-50 outline-none" />
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            ${q.stems.map(s => html`
+              <button key=${s} onClick=${() => addStem(s)} disabled=${!!value}
+                className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-slate-400 transition hover:border-white/35 hover:text-slate-100 disabled:opacity-30 disabled:hover:border-white/10 disabled:hover:text-slate-400">${s.trim()}...</button>`)}
+          </div>
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <span className="text-xs text-slate-500">${ready ? (/\?\s*$/.test(value) ? 'Ready to release.' : 'A question mark will be added.') : 'Keep going. A question needs a few more words.'}</span>
+            <button onClick=${onSubmit} disabled=${!ready}
+              className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition disabled:opacity-35"
+              style=${{ color: '#06070f', background: ready ? q.color : '#475569', boxShadow: ready ? `0 0 22px ${hexA(q.color, 0.6)}` : 'none' }}>
+              <${Icon} d=${ICONS.feather} size=${15} /> Release question
+            </button>
+          </div>
+        </div>`}
+    </section>`;
+}
+
+/* ---------- app ---------- */
+function App() {
+  const [answers, setAnswers] = useState({ factual: '', interpretive: '', universal: '' });
+  const [done, setDone] = useState({ factual: false, interpretive: false, universal: false });
+  const [found, setFound] = useState([]);
+  const [hot, setHot] = useState(null);
+  const [burst, setBurst] = useState(null);
+  const [note, setNote] = useState('');
+  const lastShown = useRef({ w: '', t: 0 });
+
+  // vitality: 0 (the slough) to 1 (new life)
+  const qScore = QS.reduce((s, q) => s + (done[q.key] ? 1 : Math.min(answers[q.key].trim().length / 30, 1) * 0.45), 0) / 3;
+  const v = Math.min(1, qScore * 0.85 + (found.length / 5) * 0.15);
+  const vRef = useRef(v); vRef.current = v;
+  const stage = stageFor(v);
+  const releasedCount = QS.filter(q => done[q.key]).length;
+  const allDone = releasedCount === 3;
+
+  const show = useCallback((w, el) => {
+    const r = el.getBoundingClientRect();
+    setHot({ w, r: { left: r.left, top: r.top, width: r.width, height: r.height } });
+    setFound(f => f.includes(w) ? f : [...f, w]);
+    const now = Date.now();
+    if (lastShown.current.w !== w || now - lastShown.current.t > 900) {
+      setBurst({ id: now, x: r.left + r.width / 2, y: r.top + r.height / 2, color: VOCAB[w].color });
+    }
+    lastShown.current = { w, t: now };
+  }, []);
+  const hide = useCallback(() => setHot(null), []);
+
+  useEffect(() => {
+    const down = e => { if (!e.target.closest || !e.target.closest('.hot')) setHot(null); };
+    const scroll = () => setHot(null);
+    document.addEventListener('pointerdown', down);
+    window.addEventListener('scroll', scroll, { passive: true });
+    return () => { document.removeEventListener('pointerdown', down); window.removeEventListener('scroll', scroll); };
+  }, []);
+
+  const submit = k => {
+    let t = answers[k].trim();
+    if (t.length < 12) return;
+    if (!/\?$/.test(t)) t += '?';
+    setAnswers(a => ({ ...a, [k]: t }));
+    setDone(d => ({ ...d, [k]: true }));
+  };
+  const reset = () => {
+    setAnswers({ factual: '', interpretive: '', universal: '' });
+    setDone({ factual: false, interpretive: false, universal: false });
+    setFound([]); setHot(null); setNote('');
+  };
+  const copyAll = async () => {
+    const text = QS.map(q => `${q.title}: ${answers[q.key]}`).join('\n');
+    try { await navigator.clipboard.writeText(text); setNote('Copied.'); }
+    catch (e) { setNote('Copy is blocked here. Select the questions above and copy them by hand.'); }
+  };
+
+  const renderPara = (text) => text.split(/\b(ampler|teeming|vast|breadth|prolific)\b/).map((part, i) =>
+    Object.prototype.hasOwnProperty.call(VOCAB, part)
+      ? html`<${Hot} key=${i} w=${part} isFound=${found.includes(part)} onShow=${show} onHide=${hide} />`
+      : part);
+
+  const titleColor = `rgb(${Math.round(148 + v * 107)},${Math.round(163 + v * 92)},${Math.round(184 + v * 71)})`;
+  const sat = 0.12 + v * 0.95;
+
+  return html`
+    <div className="relative min-h-screen overflow-x-hidden" style=${{ background: 'radial-gradient(130% 90% at 50% 0%, #0b1030 0%, #05060d 60%, #020307 100%)' }}>
+      <${Aurora} v=${v} />
+      <${Motes} vRef=${vRef} />
+
+      <div className="relative z-10 mx-auto max-w-[1180px] px-5 pb-24 pt-10 sm:px-8 lg:pt-14"
+           style=${{ filter: `saturate(${sat})`, transition: 'filter 1.4s ease' }}>
+
+        <header className="max-w-[760px]">
+          <h1 className="display font-medium leading-[0.98]"
+              style=${{ fontSize: 'clamp(2.5rem, 7vw, 5rem)', letterSpacing: `${v * 0.05}em`, color: titleColor,
+                        textShadow: `0 0 ${v * 36}px rgba(165,243,252,${v * 0.55})`, transition: 'all 1.4s ease' }}>
+            Preface to Leaves of Grass
+          </h1>
+          <p className="mt-3 max-w-[56ch] text-[0.95rem] leading-relaxed text-slate-400">
+            Walt Whitman, 1855. Hover over or tap the glowing words to learn them, then put three questions to the text.
+          </p>
+
+          <div className="mt-7" aria-live="polite">
+            <div className="flex items-baseline justify-between gap-4">
+              <span className="display text-[1.7rem] italic" style=${{ color: titleColor, transition: 'color 1.4s ease' }}>${stage.name}</span>
+              <button onClick=${reset} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-xs text-slate-400 transition hover:border-white/35 hover:text-slate-100">
+                <${Icon} d=${ICONS.reset} size=${13} /> Start over
+              </button>
+            </div>
+            <div className="mt-2 h-[5px] w-full overflow-hidden rounded-full bg-white/10">
+              <div className="meter-fill h-full rounded-full" style=${{ width: `${Math.max(v, 0.02) * 100}%`, boxShadow: `0 0 ${v * 24}px rgba(192,132,252,${v})`, transition: 'width 1.2s cubic-bezier(.2,.7,.2,1), box-shadow 1.2s ease' }}></div>
+            </div>
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-slate-500">
+              <span>${stage.line}</span>
+              <span className="inline-flex items-center gap-2">
+                Questions ${releasedCount} of 3
+                <span className="inline-flex gap-1" aria-label=${found.length + ' of 5 words found'}>
+                  ${WORDS.map(w => html`<span key=${w} className="h-2 w-2 rounded-full" style=${{ background: found.includes(w) ? VOCAB[w].color : '#334155', boxShadow: found.includes(w) ? `0 0 8px ${VOCAB[w].color}` : 'none', transition: 'all .6s ease' }}></span>`)}
+                </span>
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <main className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-10">
+
+          <article className="relative overflow-hidden px-6 py-8 sm:px-10 sm:py-11"
+                   style=${{ borderRadius: `${4 + v * 40}px`, border: `1px solid rgba(148,163,184,${0.18 + v * 0.2})`,
+                             background: 'linear-gradient(160deg, rgba(14,20,48,0.62), rgba(5,7,18,0.72))',
+                             boxShadow: `0 0 ${v * 70}px rgba(125,211,252,${v * 0.18}), inset 0 0 ${v * 60}px rgba(192,132,252,${v * 0.08})`,
+                             transition: 'all 1.4s cubic-bezier(.2,.7,.2,1)' }}>
+            <div className="pointer-events-none absolute inset-0" aria-hidden="true"
+                 style=${{ opacity: (1 - v) * 0.5, transition: 'opacity 1.6s ease',
+                           backgroundImage: 'linear-gradient(rgba(148,163,184,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.10) 1px, transparent 1px)',
+                           backgroundSize: '34px 34px' }}></div>
+            <div className="relative">
+              ${PARAS.map((p, i) => html`
+                <p key=${i} className=${'display float ' + (i ? 'mt-8' : '')}
+                   style=${{ '--amp': `${v * 6}px`, animationDelay: `${i * -4}s`,
+                             fontSize: 'clamp(1.28rem, 2.1vw, 1.6rem)', fontWeight: 400,
+                             lineHeight: 1.55 + v * 0.45, letterSpacing: `${v * 0.025}em`, wordSpacing: `${v * 0.14}em`,
+                             color: `rgba(226,232,240,${0.6 + v * 0.38})`,
+                             textShadow: `0 0 ${v * 18}px rgba(165,243,252,${v * 0.3})`,
+                             transition: 'all 1.6s cubic-bezier(.2,.7,.2,1)' }}>
+                  ${renderPara(p)}
+                </p>`)}
+            </div>
+          </article>
+
+          <div className="flex flex-col gap-5">
+            <div className="flex items-center gap-2 text-sm text-slate-400">
+              <${Icon} d=${ICONS.sparkles} size=${16} className="text-slate-300" />
+              <span>Write a question for each void, then release it.</span>
+            </div>
+            ${QS.map(q => html`
+              <${Void} key=${q.key} q=${q} value=${answers[q.key]} done=${done[q.key]}
+                onChange=${val => setAnswers(a => ({ ...a, [q.key]: val }))}
+                onSubmit=${() => submit(q.key)}
+                onRevise=${() => setDone(d => ({ ...d, [q.key]: false }))} />`)}
+
+            ${allDone && html`
+              <section className="rise relative rounded-[28px] p-6 text-center"
+                       style=${{ border: '1px solid rgba(249,168,212,.55)', background: 'radial-gradient(110% 120% at 50% 0%, rgba(249,168,212,.16), rgba(6,8,20,.7))', boxShadow: '0 0 60px rgba(249,168,212,.25)' }}>
+                <h3 className="display text-[1.9rem] italic text-pink-100" style=${{ textShadow: '0 0 22px rgba(249,168,212,.7)' }}>The corpse is borne out.</h3>
+                <p className="mx-auto mt-2 max-w-[42ch] text-sm leading-relaxed text-slate-300">
+                  Three questions, three ways of reading. Bring them to class and see which one the room argues about longest.
+                </p>
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                  <button onClick=${copyAll} className="inline-flex items-center gap-1.5 rounded-full border border-pink-200/40 px-4 py-2 text-sm text-pink-100 transition hover:border-pink-200 hover:bg-pink-200/10">
+                    <${Icon} d=${ICONS.copy} size=${15} /> Copy my questions
+                  </button>
+                </div>
+                ${note && html`<p className="mt-3 text-xs text-slate-400" role="status">${note}</p>`}
+              </section>`}
+          </div>
+        </main>
+      </div>
+
+      <${Burst} b=${burst} />
+      <${Tip} hot=${hot} found=${found.length} />
+    </div>`;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
+</script>
+</body>
+</html>
